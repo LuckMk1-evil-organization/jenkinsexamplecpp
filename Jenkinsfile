@@ -1,5 +1,5 @@
 pipeline {
-	agent any
+	agent none
 
 	options {
 		buildDiscarder(logRotator(numToKeepStr: '10'))
@@ -13,6 +13,12 @@ pipeline {
 
 	stages {
         stage('Build') {
+	    agent {
+                docker {
+                    image 'kitware/cmake'
+			label 'dind'
+                	}
+          	    }
             steps {
                 cmake arguments: '-DCMAKE_TOOLCHAIN_FILE=~/Projects/vcpkg/scripts/buildsystems/vcpkg.cmake', installation: 'InSearchPath'
                 cmakeBuild buildType: 'Release', cleanBuild: true, installation: 'InSearchPath', steps: [[withCmake: true]]
@@ -20,6 +26,12 @@ pipeline {
         }
 
         stage('Test') {
+	    agent {
+                docker {
+                    image 'kitware/cmake'
+			label 'dind'
+                	}
+          	    }
             when {
                 environment name: 'RUN_TESTS', value: 'true'
             }
@@ -29,6 +41,12 @@ pipeline {
         }
 
         stage('Analyse') {
+	    agent {
+                docker {
+                    image 'kitware/cmake'
+			label 'dind'
+                	}
+          	    }
             when {
                 environment name: 'RUN_ANALYSIS', value: 'true'
             }
@@ -39,6 +57,12 @@ pipeline {
         }
 
         stage('Deploy') {
+	    agent {
+                docker {
+                    image 'kitware/cmake'
+			label 'dind'
+                	}
+          	    }
             when {
                 environment name: 'DEPLOY', value: 'true'
             }
